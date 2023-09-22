@@ -1,37 +1,38 @@
-//
-// Created by Ethan on 9/13/2023.
-//
-
+// Action.cpp
+#include <stdexcept>
 #include "action.h"
 
-
-Action::Action(bool initHold = true) : holding(initHold) {
-    initialBalance = 0; //not sure what purpose of initialBalance is
-    balance = 0;
+Action::Action(bool initHold) : initialBalance(0.0), holding(true) {
+    this->holding=initHold;
 }
 
+// Method to buy a specific quantity at a specific price
 bool Action::buy(double price) {
-    if (!holding && balance>=price) {
-        balance -= price;
+    if (this->holding==false&&this->balance>=price) {
+        this->holding=true;
+        this->balance-=price;
         return true;
-    } else {
-        return false;
     }
+    throw std::logic_error("Wrong code");
 }
 
 bool Action::sell(double price) {
-    if (holding) {
-        balance += price;
+    if (this->holding==true) {
+        this->holding=false;
+        this->balance+=price;
         return true;
-    } else {
-        return false;
     }
+    throw std::logic_error("Wrong code");
 }
 
 bool Action::getHold() {
-    return holding;
+    return this->holding;
+}
+
+void Action::updateBalance(double amount) {
+    this->balance+=amount;
 }
 
 double Action::getBalance() {
-    return balance;
+    return this->balance;
 }
