@@ -18,6 +18,8 @@ private:
     double actionPrice; //sell price you sold it at or buy price you bought it at
     int upWindows;
     int downWindows;
+    int nonVolatileWindows;
+    int lastActed;
     std::vector<double> prev3Prices;
     void UpdateState(float price);
     // Method to buy a specific quantity at a specific price
@@ -25,13 +27,15 @@ private:
     bool CheckBuy(float price);
 
     bool sell(double price) {
-        Action::sell(price);
         actionPrice = price;
+        lastActed = 0;
+        return Action::sell(price);
     }
 
     bool buy(double price) {
-        Action::buy(price);
         actionPrice = price;
+        lastActed = 0;
+        return Action::buy(price);
     }
 };
 

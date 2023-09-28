@@ -9,6 +9,8 @@ HackathonBot::HackathonBot() {
     prev3Prices = {100, 100, 100}; //new price at back. Old prices in front ({three, two, one})
     upWindows = 0;   
     downWindows = 0;
+    lastActed = 0;
+    nonVolatileWindows = 0;
 }
 
 bool HackathonBot::isHolding() {
@@ -26,19 +28,44 @@ void HackathonBot::UpdateState(float price) {
         upWindows=0;
         downWindows=0;
     }
-    
+    lastActed += 1;
+
+    if (price <= 1.05*prev3Prices[2] && price >= .95*prev3Prices[2]) {
+        nonVolatileWindows++;
+    } else {
+        nonVolatileWindows = 0;
+    }
 }
 
 bool HackathonBot::CheckSell(float price) {
-    return ( price > (1.89)*actionPrice //89% increase
+    bool ret = ( price > (1.89)*actionPrice //89% increase
         || upWindows == 52
         || downWindows == 47
         || price < (.38)*actionPrice); //62% drop
     //wip
+    //drops 15, rises 15, drops 25. Down overall 45
+    bool complex1 = (lastActed == 3 
+    && prev3Prices[1] <= .85*prev3Prices[0]
+    && prev3Prices[2] >= 1.15*prev3Prices[1]
+    && price <= .75*prev3Prices[2]
+    && price <= .55*prev3Prices[0]);
+
+    //raises 20, drops 15, raises 30. Overall down 45
+    bool complex2 = (lastActed == 3 
+    && prev3Prices[1] >= 1.2*prev3Prices[0]
+    && prev3Prices[2] >= .85*prev3Prices[1]
+    && price <= 1.3*prev3Prices[2]
+    && price >= 1.5*prev3Prices[0]);
+
+    bool notVolatile = (nonVolatileWindows >= 5 && lastActed >= 5);
+
+    return ret || complex1 || complex2 || notVolatile;
 }
 
 bool HackathonBot::CheckBuy(float price) {
-    return true; //wip
+    bool ret = ( price < 52
+    || (lastActed >= 5 && downWindows >= 5) );
+    return ret;
 }
 
 void HackathonBot::takeAction(float price) {
