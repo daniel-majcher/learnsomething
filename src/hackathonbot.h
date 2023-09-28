@@ -8,15 +8,35 @@
 #ifndef LEARNSOMETHING_HACKATHONBOT_H
 #define LEARNSOMETHING_HACKATHONBOT_H
 
-class HackathonBot {
+//inherit from action for basic action handling
+class HackathonBot : Action {
 public:
     HackathonBot();
     void takeAction(float price);
-    double getBalance();
     bool isHolding();
 private:
-    double balance;
-    bool holding;
+    double actionPrice; //sell price you sold it at or buy price you bought it at
+    int upWindows;
+    int downWindows;
+    int nonVolatileWindows;
+    int lastActed;
+    std::vector<double> prev3Prices;
+    void UpdateState(float price);
+    // Method to buy a specific quantity at a specific price
+    bool CheckSell(float price);
+    bool CheckBuy(float price);
+
+    bool sell(double price) {
+        actionPrice = price;
+        lastActed = 0;
+        return Action::sell(price);
+    }
+
+    bool buy(double price) {
+        actionPrice = price;
+        lastActed = 0;
+        return Action::buy(price);
+    }
 };
 
 #endif //LEARNSOMETHING_HACKATHONBOT_H
